@@ -3,11 +3,19 @@ import pygame
 Width, Height = 900, 500
 game = pygame.display.set_mode((Width, Height))
 white =(255, 255, 255)
+RED =(255, 0, 0)
+YELLOW = (255, 255, 0)
 black = (0, 0, 0)
-border = pygame.Rect(Width/2 - 5, 0, 10, Height)
+border = pygame.Rect(Width//2 - 5, 0, 10, Height)
 
 FPS = 30
 veLoCitY = 15
+bulletVelcoity = 10
+
+yellowHit = pygame.USEREVENT + 1
+redHit = pygame.USEREVENT + 2
+MaXBullets = 3
+
 spaceShipHeight, spaceShipWidth = 55, 40
 LeftSpaceShipImage = pygame.image.load(os.path.join("Pics", "left.png"))
 LeftSpaceShip = pygame.transform.rotate(pygame.transform.scale(LeftSpaceShipImage, (spaceShipHeight, spaceShipWidth)), 140)
@@ -16,12 +24,19 @@ RightSpaceShip = pygame.transform.scale(RightSpaceShipImage, (spaceShipHeight, s
 
 
 
-def drawWindow(red, yellow):
+def drawWindow(red, yellow, RedBullets, YellowBulllets):
     game.fill(white)
     pygame.draw.rect(game, black, border)
     game.blit(LeftSpaceShip, (red.x, red.y))
     game.blit(RightSpaceShip, (yellow.x, yellow.y))
+
+    for bullet in RedBullets:
+        pygame.draw.rect(game, RED, bullet)
+    
+    for bullet in YellowBulllets:
+        pygame.draw.rect(game, YELLOW, bullet)
     pygame.display.update()
+
 
 def redHandleMovement(keysPressed, red):
     if keysPressed[pygame.K_a] and red.x - veLoCitY > 0:
@@ -50,10 +65,23 @@ def YellowHandleMovement(keysPressed, yellow):
         #DOWN
         yellow.y += veLoCitY       
 
-def main():
+def handleBullets(yellowBullets, redBullets, yellow, red):
+    for bullets in redBullets:
+        bullets.x += bulletVelcoity
+        if red.colliderect(bullets):
+            pygame.event.post(pygame.event.Event(redHit))
+            redBullets.remove(bullets)
+    for bullets in yellowBullets:
+        bullets.x -= bulletVelcoity
+        if yellow.colliderect(bullets):
+            pygame.event.post(pygame.event.Event(yellowHit))
+            yellowBullets.remove(bullets)
 
+def main():
     red = pygame.Rect(100, 300, spaceShipHeight, spaceShipWidth)
     yellow = pygame.Rect(700, 300, spaceShipHeight, spaceShipWidth)
+    RedBullet = []
+    YellowBullet = []
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -61,10 +89,20 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LCTRL and len(RedBullet) < MaXBullets:
+                    bullet = pygame.Rect(red.x + red.width, red.y + red.height//2 - 2, 10, 5)
+                    RedBullet.append(bullet)
+                if event.key == pygame.K_RCTRL and len(YellowBullet) < MaXBullets: 
+                    bullet = pygame.Rect(yellow.x, yellow.y + yellow.height//2 - 2, 10, 5)
+                    YellowBullet.append(bullet)
+        
         keysPressed = pygame.key.get_pressed()
         redHandleMovement(keysPressed, red) 
         YellowHandleMovement(keysPressed, yellow)
-        drawWindow(red, yellow)
+        
+        handleBullets(YellowBullet, RedBullet, yellow, red)
+        drawWindow(red, yellow, RedBullet, YellowBullet)
     pygame.quit()
 
 if __name__ == "__main__":
