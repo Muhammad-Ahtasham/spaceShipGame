@@ -1,11 +1,13 @@
 import os
-from turtle import left
 import pygame
 Width, Height = 900, 500
 game = pygame.display.set_mode((Width, Height))
 white =(255, 255, 255)
+black = (0, 0, 0)
+border = pygame.Rect(Width/2 - 5, 0, 10, Height)
+
 FPS = 30
-veLoCitY = 5
+veLoCitY = 15
 spaceShipHeight, spaceShipWidth = 55, 40
 LeftSpaceShipImage = pygame.image.load(os.path.join("Pics", "left.png"))
 LeftSpaceShip = pygame.transform.rotate(pygame.transform.scale(LeftSpaceShipImage, (spaceShipHeight, spaceShipWidth)), 140)
@@ -16,34 +18,35 @@ RightSpaceShip = pygame.transform.scale(RightSpaceShipImage, (spaceShipHeight, s
 
 def drawWindow(red, yellow):
     game.fill(white)
+    pygame.draw.rect(game, black, border)
     game.blit(LeftSpaceShip, (red.x, red.y))
     game.blit(RightSpaceShip, (yellow.x, yellow.y))
     pygame.display.update()
 
 def redHandleMovement(keysPressed, red):
-    if keysPressed[pygame.K_a]:
+    if keysPressed[pygame.K_a] and red.x - veLoCitY > 0:
         #left
         red.x -= veLoCitY
-    if keysPressed[pygame.K_d]:
+    if keysPressed[pygame.K_d] and red.x + veLoCitY + red.width < border.x:
         #Right
         red.x += veLoCitY
-    if keysPressed[pygame.K_w]:
+    if keysPressed[pygame.K_w] and red.y - veLoCitY > 0 :
         #UP
         red.y -= veLoCitY
-    if keysPressed[pygame.K_s]:
+    if keysPressed[pygame.K_s] and red.y + veLoCitY + red.height < Height:
         #DOWN
         red.y += veLoCitY   
 def YellowHandleMovement(keysPressed, yellow):
-    if keysPressed[pygame.K_LEFT]:
+    if keysPressed[pygame.K_LEFT] and yellow.x - veLoCitY > border.x + border.width:
         #left
         yellow.x -= veLoCitY
-    if keysPressed[pygame.K_RIGHT]:
+    if keysPressed[pygame.K_RIGHT] and yellow.x + veLoCitY + yellow.width < Width:
         #Right
         yellow.x += veLoCitY
-    if keysPressed[pygame.K_UP]:
+    if keysPressed[pygame.K_UP] and yellow.y - veLoCitY > 0 :
         #UP
         yellow.y -= veLoCitY
-    if keysPressed[pygame.K_DOWN]:
+    if keysPressed[pygame.K_DOWN] and yellow.y + veLoCitY + yellow.height < Height:
         #DOWN
         yellow.y += veLoCitY       
 
