@@ -1,5 +1,7 @@
 import os
 import pygame
+
+pygame.font.init()
 Width, Height = 900, 500
 game = pygame.display.set_mode((Width, Height))
 white =(255, 255, 255)
@@ -7,6 +9,8 @@ RED =(255, 0, 0)
 YELLOW = (255, 255, 0)
 black = (0, 0, 0)
 border = pygame.Rect(Width//2 - 5, 0, 10, Height)
+
+healthFOnt =pygame.font.SysFont('comicsans', 40)
 
 FPS = 30
 veLoCitY = 15
@@ -25,10 +29,18 @@ RightSpaceShip = pygame.transform.scale(RightSpaceShipImage, (spaceShipHeight, s
 
 
 
-def drawWindow(red, yellow, RedBullets, YellowBulllets):
-    game.fill(white)
+def drawWindow(red, yellow, RedBullets, YellowBulllets, redHealth, yellowHealth):
+    game.fill((0, 0, 100))
     game.blit(spaceBackGroung, (0, 0))
     pygame.draw.rect(game, black, border)
+    
+    redHealthText = healthFOnt.render("Health: " + str(redHealth), 1, white)
+    yellowHealthText = healthFOnt.render("Health: " + str(yellowHealth), 1, white)
+
+    game.blit(yellowHealthText, (Width - yellowHealthText.get_width() - 10, 10))
+    game.blit(redHealthText, (10, 10))
+
+
     game.blit(LeftSpaceShip, (red.x, red.y))
     game.blit(RightSpaceShip, (yellow.x, yellow.y))
 
@@ -89,6 +101,10 @@ def main():
     yellow = pygame.Rect(700, 300, spaceShipHeight, spaceShipWidth)
     RedBullet = []
     YellowBullet = []
+
+    redHealth = 10
+    yellowHealth = 10
+
     clock = pygame.time.Clock()
     run = True
     while run:
@@ -103,13 +119,25 @@ def main():
                 if event.key == pygame.K_RCTRL and len(YellowBullet) < MaXBullets: 
                     bullet = pygame.Rect(yellow.x, yellow.y + yellow.height//2 - 2, 10, 5)
                     YellowBullet.append(bullet)
+            winnerText = ""
+            if event.type == yellowHit:
+                yellowHealth -= 1
+            if event.type == redHit:
+                redHealth -= 1
+        
+        if redHealth <=0:
+            winnerText = "yellow Wins"
+        if yellowHealth <=0:
+            winnerText = "Red Wins"
+        if winnerText != "":
+            pass #someone won
         
         keysPressed = pygame.key.get_pressed()
         redHandleMovement(keysPressed, red) 
         YellowHandleMovement(keysPressed, yellow)
         
         handleBullets(YellowBullet, RedBullet, yellow, red)
-        drawWindow(red, yellow, RedBullet, YellowBullet)
+        drawWindow(red, yellow, RedBullet, YellowBullet, redHealth, yellowHealth)
     pygame.quit()
 
 if __name__ == "__main__":
