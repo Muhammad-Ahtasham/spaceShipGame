@@ -17,6 +17,7 @@ redHit = pygame.USEREVENT + 2
 MaXBullets = 3
 
 spaceShipHeight, spaceShipWidth = 55, 40
+spaceBackGroung = pygame.transform.scale(pygame.image.load(os.path.join('Pics', 'left.png')), (Width, Height))
 LeftSpaceShipImage = pygame.image.load(os.path.join("Pics", "left.png"))
 LeftSpaceShip = pygame.transform.rotate(pygame.transform.scale(LeftSpaceShipImage, (spaceShipHeight, spaceShipWidth)), 140)
 RightSpaceShipImage = pygame.image.load(os.path.join("Pics", "right.png"))
@@ -26,6 +27,7 @@ RightSpaceShip = pygame.transform.scale(RightSpaceShipImage, (spaceShipHeight, s
 
 def drawWindow(red, yellow, RedBullets, YellowBulllets):
     game.fill(white)
+    game.blit(spaceBackGroung, (0, 0))
     pygame.draw.rect(game, black, border)
     game.blit(LeftSpaceShip, (red.x, red.y))
     game.blit(RightSpaceShip, (yellow.x, yellow.y))
@@ -71,10 +73,15 @@ def handleBullets(yellowBullets, redBullets, yellow, red):
         if red.colliderect(bullets):
             pygame.event.post(pygame.event.Event(redHit))
             redBullets.remove(bullets)
+        elif bullets.x > Width:
+            redBullets.remove(bullets)
+
     for bullets in yellowBullets:
         bullets.x -= bulletVelcoity
         if yellow.colliderect(bullets):
             pygame.event.post(pygame.event.Event(yellowHit))
+            yellowBullets.remove(bullets)
+        elif bullets.x < 0:
             yellowBullets.remove(bullets)
 
 def main():
