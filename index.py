@@ -11,6 +11,7 @@ black = (0, 0, 0)
 border = pygame.Rect(Width//2 - 5, 0, 10, Height)
 
 healthFOnt =pygame.font.SysFont('comicsans', 40)
+winnerFOnt =pygame.font.SysFont('comicsans', 100)
 
 FPS = 30
 veLoCitY = 15
@@ -21,7 +22,7 @@ redHit = pygame.USEREVENT + 2
 MaXBullets = 3
 
 spaceShipHeight, spaceShipWidth = 55, 40
-spaceBackGroung = pygame.transform.scale(pygame.image.load(os.path.join('Pics', 'left.png')), (Width, Height))
+spaceBackGroung = pygame.transform.scale(pygame.image.load(os.path.join('Pics', 'space.jpg')), (Width, Height))
 LeftSpaceShipImage = pygame.image.load(os.path.join("Pics", "left.png"))
 LeftSpaceShip = pygame.transform.rotate(pygame.transform.scale(LeftSpaceShipImage, (spaceShipHeight, spaceShipWidth)), 140)
 RightSpaceShipImage = pygame.image.load(os.path.join("Pics", "right.png"))
@@ -95,6 +96,11 @@ def handleBullets(yellowBullets, redBullets, yellow, red):
             yellowBullets.remove(bullets)
         elif bullets.x < 0:
             yellowBullets.remove(bullets)
+def drawWinner(text):
+    drawText = winnerFOnt.render(text, 1, white)
+    game.blit(winnerFOnt, (Width/2 - drawText.get_width()/2, Height/2 - drawText.get_height()/2))
+    pygame.display.update()
+    pygame.time.delay(5000)
 
 def main():
     red = pygame.Rect(100, 300, spaceShipHeight, spaceShipWidth)
@@ -130,7 +136,8 @@ def main():
         if yellowHealth <=0:
             winnerText = "Red Wins"
         if winnerText != "":
-            pass #someone won
+            drawWinner(winnerText)
+            break
         
         keysPressed = pygame.key.get_pressed()
         redHandleMovement(keysPressed, red) 
