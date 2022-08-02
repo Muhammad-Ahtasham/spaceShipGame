@@ -2,6 +2,7 @@ import os
 import pygame
 
 pygame.font.init()
+pygame.mixer.init()
 Width, Height = 900, 500
 game = pygame.display.set_mode((Width, Height))
 white =(255, 255, 255)
@@ -10,12 +11,15 @@ YELLOW = (255, 255, 0)
 black = (0, 0, 0)
 border = pygame.Rect(Width//2 - 5, 0, 10, Height)
 
+bulletHitSound = pygame.mixer.music.load("bulletHit.mp3")
+bulletFireSound = pygame.mixer.music.load("bulletHit.mp3")
+
 healthFOnt =pygame.font.SysFont('comicsans', 40)
 winnerFOnt =pygame.font.SysFont('comicsans', 100)
 
 FPS = 30
-veLoCitY = 15
-bulletVelcoity = 10
+veLoCitY = 5
+bulletVelcoity = 20
 
 yellowHit = pygame.USEREVENT + 1
 redHit = pygame.USEREVENT + 2
@@ -121,23 +125,27 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LCTRL and len(RedBullet) < MaXBullets:
                     bullet = pygame.Rect(red.x + red.width, red.y + red.height//2 - 2, 10, 5)
-                    RedBullet.append(bullet)
+                    RedBullet.append(bullet) 
+                    # pygame.mixer.music.load(bulletHitSound)
                 if event.key == pygame.K_RCTRL and len(YellowBullet) < MaXBullets: 
                     bullet = pygame.Rect(yellow.x, yellow.y + yellow.height//2 - 2, 10, 5)
                     YellowBullet.append(bullet)
+                    # pygame.mixer.music.load(bulletHitSound)
+                
+                if event.type == yellowHit:
+                    yellowHealth -= 1
+                # pygame.mixer.music.load(bulletHitSound)
+                if event.type == redHit:
+                    redHealth -= 1
+                # pygame.mixer.music.load(bulletHitSound)
             winnerText = ""
-            if event.type == yellowHit:
-                yellowHealth -= 1
-            if event.type == redHit:
-                redHealth -= 1
-        
-        if redHealth <=0:
-            winnerText = "yellow Wins"
-        if yellowHealth <=0:
-            winnerText = "Red Wins"
-        if winnerText != "":
-            drawWinner(winnerText)
-            break
+            if redHealth <= 0:
+                winnerText = "yellow Wins"
+            if yellowHealth <=0:
+                winnerText = "Red Wins"
+            if winnerText != "":
+                drawWinner(winnerText)
+                break
         
         keysPressed = pygame.key.get_pressed()
         redHandleMovement(keysPressed, red) 
